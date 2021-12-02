@@ -39,7 +39,7 @@ public:
    * hDisplays  number of displays horizontally
    * vDisplays  number of displays vertically
    */
-  Max72xxPanel(byte csPin, byte hDisplays=1, byte vDisplays=1);
+  Max72xxPanel(byte csPin, byte datPin, byte clkPin, byte hDisplays=1, byte vDisplays=1);
 
 	/*
 	 * Define how the displays are ordered. The first display (0)
@@ -101,6 +101,8 @@ public:
 
 private:
   byte SPI_CS; /* SPI chip selection */
+  byte SPI_DAT;
+  byte SPI_CLK;
 
   /* Send out a single command to the device */
   void spiTransfer(byte opcode, byte data=0);

@@ -34,9 +34,11 @@
 #define OP_SHUTDOWN    12
 #define OP_DISPLAYTEST 15
 
-Max72xxPanel::Max72xxPanel(byte csPin, byte hDisplays, byte vDisplays) : Adafruit_GFX(hDisplays << 3, vDisplays << 3) {
+Max72xxPanel::Max72xxPanel(byte csPin, byte datPin, byte clkPin, byte hDisplays, byte vDisplays) : Adafruit_GFX(hDisplays << 3, vDisplays << 3) {
 
   Max72xxPanel::SPI_CS = csPin;
+  Max72xxPanel::SPI_DAT = datPin;
+  Max72xxPanel::SPI_CLK = clkPin;
 
   byte displays = hDisplays * vDisplays;
   Max72xxPanel::hDisplays = hDisplays;
@@ -51,10 +53,9 @@ Max72xxPanel::Max72xxPanel(byte csPin, byte hDisplays, byte vDisplays) : Adafrui
   	matrixRotation[display] = 0;
   }
 
-  SPI.begin();
-//SPI.setBitOrder(MSBFIRST);
-//SPI.setDataMode(SPI_MODE0);
   pinMode(SPI_CS, OUTPUT);
+  pinMode(SPI_DAT, OUTPUT);
+  pinMode(SPI_CLK, OUTPUT);
 
   // Clear the screen
   fillScreen(0);
@@ -185,8 +186,8 @@ void Max72xxPanel::spiTransfer(byte opcode, byte data) {
 	byte start = bitmapSize + end;
 	do {
 		start -= 8;
-		SPI.transfer(opcode);
-		SPI.transfer(opcode <= OP_DIGIT7 ? bitmap[start] : data);
+		shiftOut(SPI_DAT, SPI_CLK, MSBFIRST, opcode);
+		shiftOut(SPI_DAT, SPI_CLK, MSBFIRST, opcode <= OP_DIGIT7 ? bitmap[start] : data);
 	}
 	while ( start > end );
 
